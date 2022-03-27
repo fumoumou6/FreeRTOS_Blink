@@ -105,8 +105,9 @@ int main(void)
           (UBaseType_t           ) 1,         //数字越小 优先级越高
           (TaskHandle_t *        ) task1TaskHandle   //句柄
           );
+  HAL_UART_Transmit(&huart1,"Task: blink created!\r\n",22,0xff);
     if (task==pdPASS){
-        HAL_UART_Transmit(&huart1,"ok!\r\n",5,0xff);
+        HAL_UART_Transmit(&huart1,"Task init OK!\r\n",15,0xff);
         taskEXIT_CRITICAL();
     }
   /* Start scheduler */
@@ -173,6 +174,7 @@ void SystemClock_Config(void)
 void blink(void * pvParameters){
     while (1){
         HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+        HAL_UART_Transmit(&huart1,"TogglePin ok\r\n",14,0xff);
         osDelay(500);
     }
 }
