@@ -56,7 +56,8 @@ void MX_FREERTOS_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
+void blink( void * pvParameters );//Task1
+TaskHandle_t task1TaskHandle= NULL; //句柄
 /* USER CODE END 0 */
 
 /**
@@ -66,7 +67,7 @@ void MX_FREERTOS_Init(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-
+    uint8_t task =0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -95,7 +96,19 @@ int main(void)
   /* Init scheduler */
   osKernelInitialize();  /* Call init function for freertos objects (in freertos.c) */
   MX_FREERTOS_Init();
-
+    taskENTER_CRITICAL();
+  task = xTaskCreate(
+          (TaskFunction_t       ) blink,
+          (const char *          ) "blink",    //任务名字
+          (configSTACK_DEPTH_TYPE) 128,        //任务内存大小
+          (void *                ) NULL,      //传递给任务函数的参数
+          (UBaseType_t           ) 1,         //数字越小 优先级越高
+          (TaskHandle_t *        ) task1TaskHandle   //句柄
+          );
+    if (task==pdPASS){
+        HAL_UART_Transmit(&huart1,"ok!\r\n",5,0xff);
+        taskEXIT_CRITICAL();
+    }
   /* Start scheduler */
   osKernelStart();
 
@@ -157,7 +170,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void blink(void * pvParameters){
+    while (1){
+        HAL_GPIO_TogglePin(LED_GPIO_Port,LED_Pin);
+        osDelay(500);
+    }
+}
 /* USER CODE END 4 */
 
 /**
